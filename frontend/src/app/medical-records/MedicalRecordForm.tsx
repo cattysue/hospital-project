@@ -1,17 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createMedicalRecord, type Patient, type Doctor } from '@/lib/api'
 
 export default function MedicalRecordForm({
   patients,
   doctors,
+  onSuccess,
 }: {
   patients: Patient[]
   doctors: Doctor[]
+  onSuccess: () => void
 }) {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState({
     patient_id: '',
@@ -37,7 +37,7 @@ export default function MedicalRecordForm({
       })
       setForm({ patient_id: '', doctor_id: '', visited_at: '', chief_complaint: '', diagnosis_code: '', treatment_plan: '' })
       setOpen(false)
-      router.refresh()
+      onSuccess()
     } finally {
       setLoading(false)
     }

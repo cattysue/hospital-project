@@ -1,18 +1,23 @@
+'use client'
+
+import { useState, useEffect, use } from 'react'
 import Link from 'next/link'
-import { getPatient, getMedicalRecords } from '@/lib/api'
+import { getPatient, getMedicalRecords, type Patient, type MedicalRecord } from '@/lib/api'
 
-export const dynamic = 'force-dynamic'
+export default function PatientDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
+  const [patient, setPatient] = useState<Patient | null>(null)
+  const [records, setRecords] = useState<MedicalRecord[]>([])
+  const [loading, setLoading] = useState(true)
 
-export default async function PatientDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params
-  const [patient, records] = await Promise.all([
-    getPatient(Number(id)),
-    getMedicalRecords(Number(id)),
-  ])
+  useEffect(() => {
+    Promise.all([getPatient(Number(id)), getMedicalRecords(Number(id))])
+      .then(([p, r]) => { setPatient(p); setRecords(r) })
+      .finally(() => setLoading(false))
+  }, [id])
+
+  if (loading) return <p className="text-sm text-gray-400">불러오는 중...</p>
+  if (!patient) return <p className="text-sm text-red-500">환자를 찾을 수 없습니다.</p>
 
   return (
     <div>

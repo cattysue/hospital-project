@@ -1,11 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createDoctor } from '@/lib/api'
 
-export default function DoctorForm() {
-  const router = useRouter()
+export default function DoctorForm({ onSuccess }: { onSuccess: () => void }) {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState({ name: '', department: '' })
   const [loading, setLoading] = useState(false)
@@ -17,7 +15,7 @@ export default function DoctorForm() {
       await createDoctor(form)
       setForm({ name: '', department: '' })
       setOpen(false)
-      router.refresh()
+      onSuccess()
     } finally {
       setLoading(false)
     }
