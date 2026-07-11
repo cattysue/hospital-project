@@ -1,6 +1,8 @@
 import { getMedicalRecords, getPatients, getDoctors } from '@/lib/api'
 import MedicalRecordForm from './MedicalRecordForm'
 
+export const dynamic = 'force-dynamic'
+
 export default async function MedicalRecordsPage() {
   const [records, patients, doctors] = await Promise.all([
     getMedicalRecords(),

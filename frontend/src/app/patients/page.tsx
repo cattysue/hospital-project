@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { getPatients } from '@/lib/api'
 import PatientForm from './PatientForm'
 
+export const dynamic = 'force-dynamic'
+
 export default async function PatientsPage() {
   const patients = await getPatients()
 

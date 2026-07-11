@@ -1,6 +1,8 @@
 import { getDoctors } from '@/lib/api'
 import DoctorForm from './DoctorForm'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DoctorsPage() {
   const doctors = await getDoctors()
 
