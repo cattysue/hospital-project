@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.doctor import Doctor
@@ -47,4 +48,8 @@ def delete_doctor(doctor_id: int, db: Session = Depends(get_db)):
     if not doctor:
         raise HTTPException(status_code=404, detail="Doctor not found")
     db.delete(doctor)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="진료기록이 있는 의사는 삭제할 수 없습니다")

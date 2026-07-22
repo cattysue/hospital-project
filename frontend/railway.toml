@@ -1,5 +1,6 @@
 [build]
 builder = "nixpacks"
+rootDirectory = "frontend"
 
 [deploy]
 startCommand = "npm run start -- -p $PORT"

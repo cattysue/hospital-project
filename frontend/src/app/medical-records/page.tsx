@@ -1,19 +1,18 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getMedicalRecords, getPatients, getDoctors, deleteMedicalRecord, type MedicalRecord, type Patient, type Doctor } from '@/lib/api'
+import Link from 'next/link'
+import { getMedicalRecords, deleteMedicalRecord, type MedicalRecord } from '@/lib/api'
 import MedicalRecordForm from './MedicalRecordForm'
 
 export default function MedicalRecordsPage() {
   const [records, setRecords] = useState<MedicalRecord[]>([])
-  const [patients, setPatients] = useState<Patient[]>([])
-  const [doctors, setDoctors] = useState<Doctor[]>([])
   const [loading, setLoading] = useState(true)
 
   const load = () => {
     setLoading(true)
-    Promise.all([getMedicalRecords(), getPatients(), getDoctors()])
-      .then(([r, p, d]) => { setRecords(r); setPatients(p); setDoctors(d) })
+    getMedicalRecords()
+      .then(setRecords)
       .finally(() => setLoading(false))
   }
 
@@ -27,7 +26,7 @@ export default function MedicalRecordsPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">진료기록</h1>
-      <MedicalRecordForm patients={patients} doctors={doctors} onSuccess={load} />
+      <MedicalRecordForm onSuccess={load} />
       {loading ? (
         <p className="mt-6 text-sm text-gray-400">불러오는 중...</p>
       ) : (
@@ -43,7 +42,7 @@ export default function MedicalRecordsPage() {
             {records.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-gray-400 text-sm">
-                  진료기록이 없습니다
+                  등록된 진료기록이 없습니다
                 </td>
               </tr>
             ) : (
@@ -52,7 +51,11 @@ export default function MedicalRecordsPage() {
                   <td className="px-4 py-3 text-sm">
                     {new Date(r.visited_at).toLocaleDateString('ko-KR')}
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium">{r.patient.name}</td>
+                  <td className="px-4 py-3">
+                    <Link href={`/patients/${r.patient.id}`} className="text-blue-600 hover:underline font-medium">
+                      {r.patient.name}
+                    </Link>
+                  </td>
                   <td className="px-4 py-3 text-sm">{r.doctor.name}</td>
                   <td className="px-4 py-3 text-sm">{r.chief_complaint}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{r.diagnosis_code ?? '-'}</td>

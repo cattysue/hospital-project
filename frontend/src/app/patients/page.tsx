@@ -8,6 +8,7 @@ import PatientForm from './PatientForm'
 export default function PatientsPage() {
   const [patients, setPatients] = useState<Patient[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const load = () => {
     setLoading(true)
@@ -19,14 +20,25 @@ export default function PatientsPage() {
   useEffect(() => { load() }, [])
 
   const handleDelete = async (id: number) => {
-    await deletePatient(id)
-    load()
+    setError(null)
+    try {
+      await deletePatient(id)
+      load()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '삭제에 실패했습니다')
+    }
   }
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">환자 목록</h1>
       <PatientForm onSuccess={load} />
+      {error && (
+        <div className="mt-4 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 flex items-center justify-between">
+          {error}
+          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600">✕</button>
+        </div>
+      )}
       {loading ? (
         <p className="mt-6 text-sm text-gray-400">불러오는 중...</p>
       ) : (

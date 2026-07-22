@@ -1,18 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { createMedicalRecord, type Patient, type Doctor } from '@/lib/api'
+import { useState, useEffect } from 'react'
+import { getPatients, getDoctors, createMedicalRecord, type Patient, type Doctor } from '@/lib/api'
 
-export default function MedicalRecordForm({
-  patients,
-  doctors,
-  onSuccess,
-}: {
-  patients: Patient[]
-  doctors: Doctor[]
-  onSuccess: () => void
-}) {
+export default function MedicalRecordForm({ onSuccess }: { onSuccess: () => void }) {
   const [open, setOpen] = useState(false)
+  const [patients, setPatients] = useState<Patient[]>([])
+  const [doctors, setDoctors] = useState<Doctor[]>([])
   const [form, setForm] = useState({
     patient_id: '',
     doctor_id: '',
@@ -22,6 +16,12 @@ export default function MedicalRecordForm({
     treatment_plan: '',
   })
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!open) return
+    getPatients().then(setPatients)
+    getDoctors().then(setDoctors)
+  }, [open])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,7 +60,7 @@ export default function MedicalRecordForm({
       <select
         value={form.patient_id}
         onChange={e => setForm({ ...form, patient_id: e.target.value })}
-        className="w-full border rounded-lg px-3 py-2 text-sm bg-white"
+        className="w-full border rounded-lg px-3 py-2 text-sm"
         required
       >
         <option value="">환자 선택</option>
@@ -71,10 +71,10 @@ export default function MedicalRecordForm({
       <select
         value={form.doctor_id}
         onChange={e => setForm({ ...form, doctor_id: e.target.value })}
-        className="w-full border rounded-lg px-3 py-2 text-sm bg-white"
+        className="w-full border rounded-lg px-3 py-2 text-sm"
         required
       >
-        <option value="">의사 선택</option>
+        <option value="">담당의 선택</option>
         {doctors.map(d => (
           <option key={d.id} value={d.id}>{d.name} ({d.department})</option>
         ))}
@@ -87,24 +87,24 @@ export default function MedicalRecordForm({
         required
       />
       <input
-        placeholder="주호소 (예: 두통, 발열)"
+        placeholder="주호소"
         value={form.chief_complaint}
         onChange={e => setForm({ ...form, chief_complaint: e.target.value })}
         className="w-full border rounded-lg px-3 py-2 text-sm"
         required
       />
       <input
-        placeholder="진단코드 (예: R51, 선택)"
+        placeholder="진단코드 (선택)"
         value={form.diagnosis_code}
         onChange={e => setForm({ ...form, diagnosis_code: e.target.value })}
         className="w-full border rounded-lg px-3 py-2 text-sm"
       />
       <textarea
-        placeholder="치료 계획 (선택)"
+        placeholder="치료계획 (선택)"
         value={form.treatment_plan}
         onChange={e => setForm({ ...form, treatment_plan: e.target.value })}
         className="w-full border rounded-lg px-3 py-2 text-sm"
-        rows={3}
+        rows={2}
       />
       <div className="flex gap-2">
         <button
