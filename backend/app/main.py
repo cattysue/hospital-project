@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.auth import verify_token
 from app.database import Base, engine
 import app.models
 from app.routers import patients, doctors, medical_records
@@ -15,9 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(patients.router)
-app.include_router(doctors.router)
-app.include_router(medical_records.router)
+app.include_router(patients.router, dependencies=[Depends(verify_token)])
+app.include_router(doctors.router, dependencies=[Depends(verify_token)])
+app.include_router(medical_records.router, dependencies=[Depends(verify_token)])
 
 
 @app.get("/")

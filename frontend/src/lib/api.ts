@@ -1,4 +1,5 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN || ''
 
 export type Patient = {
   id: number
@@ -29,7 +30,11 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     cache: 'no-store',
     ...init,
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${API_TOKEN}`,
+      ...init?.headers,
+    },
   })
   if (!res.ok) {
     const body = await res.json().catch(() => null)
